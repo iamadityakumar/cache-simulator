@@ -59,7 +59,7 @@ const CacheLevel& MemoryHierarchy::cache_level(size_t index) const {
     return *levels_[index];
 }
 
-size_t MemoryHierarchy::num_levels() const {
+size_t MemoryHierarchy::num_levels() const noexcept {
     return levels_.size();
 }
 

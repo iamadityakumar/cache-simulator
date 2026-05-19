@@ -52,10 +52,10 @@ public:
     const CacheLevel& cache_level(size_t index) const;
 
     // Number of cache levels (not counting main memory).
-    size_t num_levels() const;
+    size_t num_levels() const noexcept;
 
     // Main memory latency.
-    uint64_t mem_latency() const { return mem_latency_; }
+    uint64_t mem_latency() const noexcept { return mem_latency_; }
 
     // Reset the entire hierarchy and statistics.
     void reset();

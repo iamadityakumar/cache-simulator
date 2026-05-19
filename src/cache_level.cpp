@@ -1,12 +1,11 @@
 #include "cache_level.h"
 #include <stdexcept>
-#include <cmath>
 
-bool CacheLevel::is_power_of_2(size_t v) {
+constexpr bool CacheLevel::is_power_of_2(size_t v) noexcept {
     return v > 0 && (v & (v - 1)) == 0;
 }
 
-size_t CacheLevel::log2_int(size_t v) {
+constexpr size_t CacheLevel::log2_int(size_t v) noexcept {
     size_t r = 0;
     while (v >>= 1) r++;
     return r;

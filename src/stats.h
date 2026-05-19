@@ -13,11 +13,11 @@ struct LevelStats {
     uint64_t    latency    = 0;  // hit latency for this level (cycles)
 
     // Computed values
-    double hit_rate() const {
+    [[nodiscard]] double hit_rate() const noexcept {
         return accesses > 0 ? static_cast<double>(hits) / accesses : 0.0;
     }
 
-    double miss_rate() const {
+    [[nodiscard]] double miss_rate() const noexcept {
         return accesses > 0 ? static_cast<double>(misses) / accesses : 0.0;
     }
 };
@@ -46,23 +46,23 @@ public:
     const std::vector<LevelStats>& all_levels() const;
 
     // Number of cache levels (not counting main memory).
-    size_t num_levels() const;
+    size_t num_levels() const noexcept;
 
     // Total accesses driven through the hierarchy (= L1 accesses).
-    uint64_t total_accesses() const;
+    uint64_t total_accesses() const noexcept;
 
     // Compute Average Memory Access Time (AMAT).
     // AMAT = L1_hit_time + L1_miss_rate * (L2_hit_time + L2_miss_rate * (L3_hit_time + L3_miss_rate * mem_latency))
-    double amat() const;
+    [[nodiscard]] double amat() const noexcept;
 
     // Total accumulated latency across all accesses.
-    uint64_t total_latency() const;
+    uint64_t total_latency() const noexcept;
 
     // Average latency per access.
-    double avg_latency() const;
+    [[nodiscard]] double avg_latency() const noexcept;
 
     // Main memory latency.
-    uint64_t mem_latency() const { return mem_latency_; }
+    uint64_t mem_latency() const noexcept { return mem_latency_; }
 
     // Reset all counters.
     void reset();

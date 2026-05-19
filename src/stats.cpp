@@ -47,16 +47,16 @@ const std::vector<LevelStats>& Statistics::all_levels() const {
     return levels_;
 }
 
-size_t Statistics::num_levels() const {
+size_t Statistics::num_levels() const noexcept {
     return levels_.size();
 }
 
-uint64_t Statistics::total_accesses() const {
+uint64_t Statistics::total_accesses() const noexcept {
     // Total accesses = L1 accesses (everything enters through L1)
     return levels_.empty() ? 0 : levels_[0].accesses;
 }
 
-double Statistics::amat() const {
+double Statistics::amat() const noexcept {
     // AMAT = L1_hit_time + L1_miss_rate * (L2_hit_time + L2_miss_rate * (...))
     // Recursive from innermost level outward:
     //   cost(last) = latency[last] + miss_rate[last] * mem_latency
@@ -76,11 +76,11 @@ double Statistics::amat() const {
     return cost;
 }
 
-uint64_t Statistics::total_latency() const {
+uint64_t Statistics::total_latency() const noexcept {
     return total_latency_;
 }
 
-double Statistics::avg_latency() const {
+double Statistics::avg_latency() const noexcept {
     uint64_t accesses = total_accesses();
     return accesses > 0 ? static_cast<double>(total_latency_) / accesses : 0.0;
 }

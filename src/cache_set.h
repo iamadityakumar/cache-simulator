@@ -25,7 +25,7 @@ public:
     std::optional<uint64_t> insert(uint64_t tag, bool is_write);
 
     // Check if a tag is present in this set (does NOT update policy state).
-    bool contains(uint64_t tag) const;
+    [[nodiscard]] bool contains(uint64_t tag) const;
 
     // Mark a line as dirty (for write-back tracking).
     void mark_dirty(uint64_t tag);
@@ -40,7 +40,7 @@ public:
     size_t occupancy() const;
 
     // Max capacity of this set.
-    size_t capacity() const { return associativity_; }
+    size_t capacity() const noexcept { return associativity_; }
 
 private:
     size_t associativity_;

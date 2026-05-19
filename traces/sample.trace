@@ -1,0 +1,45 @@
+# Trace file: sample.trace
+# A small hand-crafted trace demonstrating basic read/write patterns.
+# Format: <R|W> <hex_address>
+#
+# Scenario: Simple program accessing an array and a counter variable.
+#   - Array base: 0x1000 (64-byte stride = one cache line per element)
+#   - Counter:    0x2000 (repeatedly read/written)
+
+# --- Cold start: first access to each address is a compulsory miss ---
+
+R 0x1000         # Read array[0]  — cold miss
+R 0x1040         # Read array[1]  — cold miss (next cache line)
+R 0x1080         # Read array[2]  — cold miss
+R 0x10C0         # Read array[3]  — cold miss
+W 0x2000         # Write counter  — cold miss
+
+# --- Temporal locality: re-access recently used data ---
+
+R 0x1000         # Read array[0]  — should HIT in L1
+R 0x1040         # Read array[1]  — should HIT in L1
+W 0x2000         # Write counter  — should HIT in L1
+
+# --- Spatial locality: access within same cache line ---
+
+R 0x1004         # Read array[0]+4 — same block as 0x1000, HIT
+R 0x1048         # Read array[1]+8 — same block as 0x1040, HIT
+
+# --- New accesses: expand working set ---
+
+R 0x1100         # Read array[4]  — cold miss
+R 0x1140         # Read array[5]  — cold miss
+R 0x1180         # Read array[6]  — cold miss
+R 0x11C0         # Read array[7]  — cold miss
+
+# --- Write-back pattern ---
+
+W 0x1000         # Write array[0] — HIT (still cached), marks dirty
+W 0x1040         # Write array[1] — HIT, marks dirty
+R 0x2000         # Read counter   — HIT
+
+# --- Stride access: sequential scan ---
+
+R 0x3000         # New region — cold miss
+R 0x3040         # Sequential   — cold miss
+R 0x3080         # Sequential   — cold miss

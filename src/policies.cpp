@@ -38,7 +38,7 @@ std::optional<uint64_t> LRUPolicy::insert(uint64_t tag) {
     return evicted;
 }
 
-bool LRUPolicy::contains(uint64_t tag) const {
+bool LRUPolicy::contains(uint64_t tag) const noexcept {
     return map_.find(tag) != map_.end();
 }
 
@@ -50,7 +50,7 @@ void LRUPolicy::remove(uint64_t tag) {
     }
 }
 
-size_t LRUPolicy::size() const {
+size_t LRUPolicy::size() const noexcept {
     return order_.size();
 }
 
@@ -87,7 +87,7 @@ std::optional<uint64_t> FIFOPolicy::insert(uint64_t tag) {
     return evicted;
 }
 
-bool FIFOPolicy::contains(uint64_t tag) const {
+bool FIFOPolicy::contains(uint64_t tag) const noexcept {
     return map_.find(tag) != map_.end();
 }
 
@@ -99,7 +99,7 @@ void FIFOPolicy::remove(uint64_t tag) {
     }
 }
 
-size_t FIFOPolicy::size() const {
+size_t FIFOPolicy::size() const noexcept {
     return order_.size();
 }
 

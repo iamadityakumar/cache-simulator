@@ -1,0 +1,95 @@
+# Trace file: matrix_multiply.trace
+# Simulates a small matrix multiplication: C[i][j] += A[i][k] * B[k][j]
+# Matrices are 4x4 of 8-byte doubles, row-major layout.
+#
+# Memory layout:
+#   A: 0x10000 — 0x1007F  (4×4×8 = 128 bytes, 2 cache lines)
+#   B: 0x10080 — 0x100FF  (4×4×8 = 128 bytes, 2 cache lines)
+#   C: 0x10100 — 0x1017F  (4×4×8 = 128 bytes, 2 cache lines)
+#
+# Access pattern shows:
+#   - Good spatial locality for A (row-major scan)
+#   - Poor spatial locality for B (column-major scan → cache thrashing)
+#   - Repeated writes to C (accumulation → temporal locality)
+
+# === i=0, j=0: C[0][0] += A[0][k] * B[k][0] for k=0..3 ===
+R 0x10100        # Read  C[0][0]
+R 0x10000        # Read  A[0][0]
+R 0x10080        # Read  B[0][0]
+R 0x10008        # Read  A[0][1]     — same cache line as A[0][0], HIT
+R 0x100A0        # Read  B[1][0]     — stride=32 from B[0][0]
+R 0x10010        # Read  A[0][2]     — same cache line as A[0][0], HIT
+R 0x100C0        # Read  B[2][0]     — stride=32
+R 0x10018        # Read  A[0][3]     — same cache line as A[0][0], HIT
+R 0x100E0        # Read  B[3][0]     — stride=32
+W 0x10100        # Write C[0][0]     — HIT (already read)
+
+# === i=0, j=1: C[0][1] += A[0][k] * B[k][1] ===
+R 0x10108        # Read  C[0][1]     — same cache line as C[0][0], HIT
+R 0x10000        # Read  A[0][0]     — HIT (temporal reuse from previous)
+R 0x10088        # Read  B[0][1]     — same cache line as B[0][0], HIT
+R 0x10008        # Read  A[0][1]     — HIT
+R 0x100A8        # Read  B[1][1]     — same cache line as B[1][0], HIT
+R 0x10010        # Read  A[0][2]     — HIT
+R 0x100C8        # Read  B[2][1]     — same cache line as B[2][0], HIT
+R 0x10018        # Read  A[0][3]     — HIT
+R 0x100E8        # Read  B[3][1]     — same cache line as B[3][0], HIT
+W 0x10108        # Write C[0][1]     — HIT
+
+# === i=0, j=2: C[0][2] += A[0][k] * B[k][2] ===
+R 0x10110        # Read  C[0][2]     — same cache line as C[0][0], HIT
+R 0x10000        # Read  A[0][0]     — HIT
+R 0x10090        # Read  B[0][2]     — same cache line as B[0][0], HIT
+R 0x10008        # Read  A[0][1]     — HIT
+R 0x100B0        # Read  B[1][2]     — same cache line as B[1][0], HIT
+R 0x10010        # Read  A[0][2]     — HIT
+R 0x100D0        # Read  B[2][2]     — same cache line as B[2][0], HIT
+R 0x10018        # Read  A[0][3]     — HIT
+R 0x100F0        # Read  B[3][2]     — same cache line as B[3][0], HIT
+W 0x10110        # Write C[0][2]     — HIT
+
+# === i=0, j=3: C[0][3] += A[0][k] * B[k][3] ===
+R 0x10118        # Read  C[0][3]     — same cache line, HIT
+R 0x10000        # Read  A[0][0]     — HIT
+R 0x10098        # Read  B[0][3]     — same cache line as B[0][0], HIT
+R 0x10008        # Read  A[0][1]     — HIT
+R 0x100B8        # Read  B[1][3]     — same cache line as B[1][0], HIT
+R 0x10010        # Read  A[0][2]     — HIT
+R 0x100D8        # Read  B[2][3]     — same cache line as B[2][0], HIT
+R 0x10018        # Read  A[0][3]     — HIT
+R 0x100F8        # Read  B[3][3]     — same cache line as B[3][0], HIT
+W 0x10118        # Write C[0][3]     — HIT
+
+# === i=1, j=0: C[1][0] += A[1][k] * B[k][0] ===
+R 0x10120        # Read  C[1][0]     — next cache line of C
+R 0x10020        # Read  A[1][0]     — same cache line as A[0][0], HIT
+R 0x10080        # Read  B[0][0]     — HIT (cached from i=0)
+R 0x10028        # Read  A[1][1]     — same cache line, HIT
+R 0x100A0        # Read  B[1][0]     — HIT
+R 0x10030        # Read  A[1][2]     — same cache line, HIT
+R 0x100C0        # Read  B[2][0]     — HIT
+R 0x10038        # Read  A[1][3]     — same cache line, HIT
+R 0x100E0        # Read  B[3][0]     — HIT
+W 0x10120        # Write C[1][0]
+
+# === i=1, j=1: C[1][1] += A[1][k] * B[k][1] ===
+R 0x10128        # Read  C[1][1]
+R 0x10020        # Read  A[1][0]     — HIT
+R 0x10088        # Read  B[0][1]     — HIT
+R 0x10028        # Read  A[1][1]     — HIT
+R 0x100A8        # Read  B[1][1]     — HIT
+R 0x10030        # Read  A[1][2]     — HIT
+R 0x100C8        # Read  B[2][1]     — HIT
+R 0x10038        # Read  A[1][3]     — HIT
+R 0x100E8        # Read  B[3][1]     — HIT
+W 0x10128        # Write C[1][1]
+
+# === i=1, j=2 (partial — 8 entries) ===
+R 0x10130        # Read  C[1][2]
+R 0x10020        # Read  A[1][0]     — HIT
+R 0x10090        # Read  B[0][2]     — HIT
+R 0x10028        # Read  A[1][1]     — HIT
+R 0x100B0        # Read  B[1][2]     — HIT
+R 0x10030        # Read  A[1][2]     — HIT
+R 0x100D0        # Read  B[2][2]     — HIT
+W 0x10130        # Write C[1][2]

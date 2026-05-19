@@ -39,18 +39,18 @@ public:
     std::optional<uint64_t> fill(uint64_t address, bool is_write);
 
     // Check if a block address is present in the cache.
-    bool contains(uint64_t address) const;
+    [[nodiscard]] bool contains(uint64_t address) const;
 
     // Invalidate a block address.
     void invalidate(uint64_t address);
 
     // Getters
-    const std::string& name() const { return name_; }
-    size_t total_size() const { return total_size_; }
-    size_t block_size() const { return block_size_; }
-    size_t associativity() const { return associativity_; }
-    size_t num_sets() const { return num_sets_; }
-    uint64_t hit_latency() const { return hit_latency_; }
+    const std::string& name() const noexcept { return name_; }
+    size_t total_size() const noexcept { return total_size_; }
+    size_t block_size() const noexcept { return block_size_; }
+    size_t associativity() const noexcept { return associativity_; }
+    size_t num_sets() const noexcept { return num_sets_; }
+    uint64_t hit_latency() const noexcept { return hit_latency_; }
 
     // Address decomposition helpers
     uint64_t get_tag(uint64_t address) const;
@@ -72,6 +72,6 @@ private:
     std::vector<CacheSet> sets_;
 
     // Validate that value is a power of 2
-    static bool is_power_of_2(size_t v);
-    static size_t log2_int(size_t v);
+    static constexpr bool is_power_of_2(size_t v) noexcept;
+    static constexpr size_t log2_int(size_t v) noexcept;
 };

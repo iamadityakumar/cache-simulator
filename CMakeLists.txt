@@ -13,6 +13,12 @@ set(SOURCES
     src/cache_level.cpp
     src/stats.cpp
     src/memory_hierarchy.cpp
+    src/trace_loader.cpp
+    src/config.cpp
+    src/cli.cpp
+    src/report.cpp
+    src/sweep.cpp
+    src/compare.cpp
 )
 
 add_executable(cache-sim ${SOURCES})
@@ -24,11 +30,21 @@ set(TEST_SOURCES
     tests/test_policies.cpp
     tests/test_cache_level.cpp
     tests/test_hierarchy.cpp
+    tests/test_trace.cpp
+    tests/test_cli_report.cpp
+    tests/test_analysis.cpp
+    tests/test_edge_cases.cpp
     src/policies.cpp
     src/cache_set.cpp
     src/cache_level.cpp
     src/stats.cpp
     src/memory_hierarchy.cpp
+    src/trace_loader.cpp
+    src/config.cpp
+    src/cli.cpp
+    src/report.cpp
+    src/sweep.cpp
+    src/compare.cpp
 )
 
 add_executable(cache-sim-tests ${TEST_SOURCES})

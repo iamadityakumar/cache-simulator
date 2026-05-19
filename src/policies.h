@@ -22,16 +22,16 @@ public:
     virtual std::optional<uint64_t> insert(uint64_t tag) = 0;
 
     // Returns true if the tag is present.
-    virtual bool contains(uint64_t tag) const = 0;
+    virtual bool contains(uint64_t tag) const noexcept = 0;
 
     // Remove a specific tag (used during invalidation / hierarchy management).
     virtual void remove(uint64_t tag) = 0;
 
     // Current number of entries.
-    virtual size_t size() const = 0;
+    virtual size_t size() const noexcept = 0;
 
     // Policy name for reporting.
-    virtual std::string name() const = 0;
+    virtual std::string name() const noexcept = 0;
 };
 
 // LRU (Least Recently Used) replacement policy.
@@ -44,10 +44,10 @@ public:
 
     bool access(uint64_t tag) override;
     std::optional<uint64_t> insert(uint64_t tag) override;
-    bool contains(uint64_t tag) const override;
+    bool contains(uint64_t tag) const noexcept override;
     void remove(uint64_t tag) override;
-    size_t size() const override;
-    std::string name() const override { return "LRU"; }
+    size_t size() const noexcept override;
+    std::string name() const noexcept override { return "LRU"; }
 
 private:
     size_t capacity_;
@@ -65,10 +65,10 @@ public:
 
     bool access(uint64_t tag) override;
     std::optional<uint64_t> insert(uint64_t tag) override;
-    bool contains(uint64_t tag) const override;
+    bool contains(uint64_t tag) const noexcept override;
     void remove(uint64_t tag) override;
-    size_t size() const override;
-    std::string name() const override { return "FIFO"; }
+    size_t size() const noexcept override;
+    std::string name() const noexcept override { return "FIFO"; }
 
 private:
     size_t capacity_;
